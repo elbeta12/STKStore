@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>STKHouse Shop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: #fff;
+      color: #000;
+      display: flex;
+    }
+    aside {
+      background: #000;
+      color: white;
+      width: 250px;
+      height: 100vh;
+      padding: 2rem 1rem;
+      position: fixed;
+    }
+    aside img {
+      max-width: 100%;
+    }
+    aside nav a {
+      display: block;
+      margin: 10px 0;
+      color: white;
+      text-decoration: none;
+    }
+    aside nav a:hover {
+      text-decoration: underline;
+    }
+    main {
+      margin-left: 250px;
+      padding: 2rem;
+      flex: 1;
+    }
+    .section {
+      display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    .product-card {
+      background: #f8f8f8;
+      border-radius: 10px;
+      padding: 1rem;
+      transition: transform 0.3s ease;
+    }
+    .product-card:hover {
+      transform: scale(1.03);
+    }
+    .btn-buy {
+      background-color: #000;
+      border: none;
+      color: white;
+    }
+    .btn-buy:hover {
+      background-color: #333;
+    }
+    .cart-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #000;
+      color: #fff;
+      padding: 1rem;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 1000;
+      transition: transform 0.2s ease;
+    }
+    .cart-button:hover {
+      transform: scale(1.1);
+    }
+    .alert {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <img src="STK.jfif" alt="STK House">
+    <h2 class="mt-4">Menú</h2>
+    <nav>
+      <a href="#" onclick="mostrarSeccion('shop')">🛍️ Shop</a>
+      <a href="#" onclick="mostrarSeccion('cliente')">📞 Servicio al Cliente</a>
+      <a href="#" onclick="mostrarSeccion('redes')">🌐 Redes Sociales</a>
+    </nav>
+    <input id="search" class="form-control mt-2" placeholder="Buscar producto...">
+  </aside>
+
+  <main>
+    <div id="shop" class="section active">
+      <div class="container">
+        <div class="row" id="product-list"></div>
+      </div>
+    </div>
+
+    <div id="cliente" class="section">
+      <h3>Contáctanos</h3>
+      <a href="https://wa.me/573001112233" target="_blank" class="btn btn-success">Ir a WhatsApp</a>
+    </div>
+
+    <div id="redes" class="section">
+      <h3>Síguenos en redes sociales</h3>
+      <a href="https://tiktok.com/@tuusuario" target="_blank" class="btn btn-dark mb-2">TikTok</a><br>
+      <a href="https://instagram.com/tuusuario" target="_blank" class="btn btn-dark">Instagram</a>
+    </div>
+  </main>
+
+  <!-- Botón del carrito -->
+  <div class="cart-button" onclick="verCarrito()">🛒</div>
+
+  <!-- Modal carrito -->
+  <div class="modal fade" id="cartModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Finalizar compra</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <ul id="cart" class="list-group mb-3"></ul>
+          <form id="pedidoForm">
+            <div class="mb-2">
+              <label class="form-label">Nombre</label>
+              <input type="text" id="nombre" class="form-control" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">WhatsApp</label>
+              <input type="text" id="whatsapp" class="form-control" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Método de Pago</label>
+              <select id="metodo" class="form-select" required>
+                <option value="">Seleccionar</option>
+                <option value="Nequi">Nequi</option>
+                <option value="Tarjeta">Tarjeta</option>
+                <option value="Contra Entrega">Contra Entrega</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-buy w-100 mt-2">Enviar Pedido</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="alertas"></div>
+
+  <script>
+    const productos = [
+      { id: 1, nombre: 'Camiseta Negra', precio: 60000, img: 'https://via.placeholder.com/300x300' },
+      { id: 2, nombre: 'Gorra Blanca', precio: 30000, img: 'https://via.placeholder.com/300x300' }
+    ];
+
+    const carrito = [];
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1390018262133113033/lQ39FQQwdv_InQ9j62sR_QwSEcs-H_n3OyYJggWPyvSZ_28yxKPXqV-aQX-QJkrYv33c";
+
+    function mostrarSeccion(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function renderProductos(filtrados = productos) {
+      const contenedor = document.getElementById('product-list');
+      contenedor.innerHTML = '';
+      filtrados.forEach(prod => {
+        contenedor.innerHTML += `
+          <div class="col-md-4 mb-4">
+            <div class="product-card">
+              <img src="${prod.img}" class="img-fluid mb-2">
+              <h4>${prod.nombre}</h4>
+              <p>$${prod.precio.toLocaleString()}</p>
+              <button class="btn btn-buy" onclick='agregarAlCarrito(${JSON.stringify(prod)})'>Añadir</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function agregarAlCarrito(prod) {
+      carrito.push(prod);
+      renderCarrito();
+      mostrarAlerta(`${prod.nombre} añadido al carrito`);
+    }
+
+    function renderCarrito() {
+      const ul = document.getElementById('cart');
+      if (!ul) return;
+      ul.innerHTML = '';
+      carrito.forEach((p, i) => {
+        ul.innerHTML += `<li class="list-group-item d-flex justify-content-between">
+          ${p.nombre} - $${p.precio.toLocaleString()}
+          <button class="btn btn-sm btn-danger" onclick="eliminar(${i})">X</button>
+        </li>`;
+      });
+    }
+
+    function eliminar(i) {
+      carrito.splice(i, 1);
+      renderCarrito();
+    }
+
+    function verCarrito() {
+      renderCarrito();
+      const modal = new bootstrap.Modal(document.getElementById('cartModal'));
+      modal.show();
+    }
+
+    function mostrarAlerta(mensaje) {
+      const div = document.createElement('div');
+      div.className = 'alert alert-success';
+      div.innerText = mensaje;
+      document.getElementById('alertas').appendChild(div);
+      setTimeout(() => div.remove(), 3000);
+    }
+
+    document.getElementById('pedidoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value;
+      const whatsapp = document.getElementById('whatsapp').value;
+      const metodo = document.getElementById('metodo').value;
+      const resumen = carrito.map(p => `• ${p.nombre} - $${p.precio.toLocaleString()}`).join('\n');
+      const total = carrito.reduce((acc, p) => acc + p.precio, 0);
+
+      const contenido = {
+        content: `📦 **Nuevo Pedido STK House**\n\n` +
+                 `👤 **Nombre:** ${nombre}\n` +
+                 `📱 **WhatsApp:** ${whatsapp}\n` +
+                 `💰 **Método de Pago:** ${metodo}\n\n` +
+                 `🛍️ **Productos:**\n${resumen}\n\n` +
+                 `💵 **Total:** $${total.toLocaleString()}`
+      };
+
+      try {
+        await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(contenido)
+        });
+        mostrarAlerta("Estaremos en contacto contigo via WhatsApp");
+      } catch {
+        mostrarAlerta("❌ Error al enviar pedido");
+      }
+
+      carrito.length = 0;
+      renderCarrito();
+      document.getElementById('pedidoForm').reset();
+      const modal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
+      modal.hide();
+    });
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      const texto = e.target.value.toLowerCase();
+      const filtrados = productos.filter(p => p.nombre.toLowerCase().includes(texto));
+      renderProductos(filtrados);
+    });
+
+    renderProductos();
+  </script>
+</body>
+</html>
