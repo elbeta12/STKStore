@@ -5,125 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>STKHouse Shop</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Poppins', sans-serif;
       margin: 0;
       background: #fff;
       color: #000;
-      display: flex;
     }
+
     aside {
       background: #000;
       color: white;
-      width: 250px;
-      height: 100vh;
-      padding: 2rem 1rem;
-      position: fixed;
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
     }
+
     aside img {
-      max-width: 100%;
+      max-width: 150px;
     }
+
+    aside nav {
+      margin-top: 1rem;
+    }
+
     aside nav a {
-      display: block;
-      margin: 10px 0;
+      display: inline-block;
+      margin: 5px 10px;
       color: white;
       text-decoration: none;
+      font-size: 0.9rem;
     }
-    aside nav a:hover {
-      text-decoration: underline;
-    }
+
     main {
-      margin-left: 250px;
-      padding: 2rem;
-      flex: 1;
+      padding: 1rem;
     }
-    .section {
-      display: none;
-    }
-    .section.active {
-      display: block;
-    }
+
     .product-card {
       background: #f8f8f8;
       border-radius: 10px;
       padding: 1rem;
-      transition: transform 0.3s ease;
+      margin-bottom: 1rem;
     }
-    .product-card:hover {
-      transform: scale(1.03);
-    }
+
     .btn-buy {
       background-color: #000;
       border: none;
       color: white;
+      width: 100%;
     }
+
     .btn-buy:hover {
       background-color: #333;
     }
+
     .cart-button {
       position: fixed;
       bottom: 20px;
       right: 20px;
       background: #000;
       color: #fff;
-      padding: 1rem;
-      border-radius: 50%;
-      font-size: 1.5rem;
+      padding: 0.8rem 1rem;
+      border-radius: 50px;
+      font-size: 1.2rem;
       cursor: pointer;
       z-index: 1000;
-      transition: transform 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .cart-button:hover {
-      transform: scale(1.1);
-    }
+
     .alert {
       position: fixed;
       top: 10px;
       right: 10px;
       z-index: 9999;
     }
+
+    @media (min-width: 768px) {
+      .product-card {
+        margin-bottom: 2rem;
+      }
+    }
   </style>
 </head>
 <body>
+
   <aside>
     <img src="STK.jfif" alt="STK House">
-    <h2 class="mt-4">Menú</h2>
     <nav>
       <a href="#" onclick="mostrarSeccion('shop')">🛍️ Shop</a>
-      <a href="#" onclick="mostrarSeccion('cliente')">📞 Servicio al Cliente</a>
-      <a href="#" onclick="mostrarSeccion('redes')">🌐 Redes Sociales</a>
+      <a href="#" onclick="mostrarSeccion('cliente')">📞 Soporte</a>
+      <a href="#" onclick="mostrarSeccion('redes')">🌐 Redes</a>
     </nav>
-    <input id="search" class="form-control mt-2" placeholder="Buscar producto...">
+    <input id="search" class="form-control mt-3" placeholder="Buscar producto...">
   </aside>
 
   <main>
     <div id="shop" class="section active">
-      <div class="container">
-        <div class="row" id="product-list"></div>
-      </div>
+      <div class="row" id="product-list"></div>
     </div>
 
-    <div id="cliente" class="section">
-      <h3>Contáctanos</h3>
-      <a href="https://wa.me/573001112233" target="_blank" class="btn btn-success">Ir a WhatsApp</a>
+    <div id="cliente" class="section" style="display:none">
+      <h4 class="mt-3">Contáctanos</h4>
+      <a href="https://wa.me/573001112233" target="_blank" class="btn btn-success">WhatsApp</a>
     </div>
 
-    <div id="redes" class="section">
-      <h3>Síguenos en redes sociales</h3>
-      <a href="https://tiktok.com/@tuusuario" target="_blank" class="btn btn-dark mb-2">TikTok</a><br>
-      <a href="https://instagram.com/tuusuario" target="_blank" class="btn btn-dark">Instagram</a>
+    <div id="redes" class="section" style="display:none">
+      <h4 class="mt-3">Síguenos</h4>
+      <a href="https://tiktok.com/@tuusuario" target="_blank" class="btn btn-dark mb-2 w-100">TikTok</a>
+      <a href="https://instagram.com/tuusuario" target="_blank" class="btn btn-dark w-100">Instagram</a>
     </div>
   </main>
 
-  <!-- Botón del carrito -->
-  <div class="cart-button" onclick="verCarrito()">🛒</div>
+  <!-- Botón carrito -->
+  <div class="cart-button" onclick="verCarrito()">🛒 <span>Carrito</span></div>
 
   <!-- Modal carrito -->
   <div class="modal fade" id="cartModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Finalizar compra</h5>
@@ -141,7 +147,7 @@
               <input type="text" id="whatsapp" class="form-control" required>
             </div>
             <div class="mb-2">
-              <label class="form-label">Método de Pago</label>
+              <label class="form-label">Método de pago</label>
               <select id="metodo" class="form-select" required>
                 <option value="">Seleccionar</option>
                 <option value="Nequi">Nequi</option>
@@ -149,7 +155,7 @@
                 <option value="Contra Entrega">Contra Entrega</option>
               </select>
             </div>
-            <button type="submit" class="btn btn-buy w-100 mt-2">Enviar Pedido</button>
+            <button type="submit" class="btn btn-buy mt-2">Enviar Pedido</button>
           </form>
         </div>
       </div>
@@ -168,8 +174,8 @@
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1390018262133113033/lQ39FQQwdv_InQ9j62sR_QwSEcs-H_n3OyYJggWPyvSZ_28yxKPXqV-aQX-QJkrYv33c";
 
     function mostrarSeccion(id) {
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
     }
 
     function renderProductos(filtrados = productos) {
@@ -177,10 +183,10 @@
       contenedor.innerHTML = '';
       filtrados.forEach(prod => {
         contenedor.innerHTML += `
-          <div class="col-md-4 mb-4">
+          <div class="col-12 col-md-6">
             <div class="product-card">
               <img src="${prod.img}" class="img-fluid mb-2">
-              <h4>${prod.nombre}</h4>
+              <h5>${prod.nombre}</h5>
               <p>$${prod.precio.toLocaleString()}</p>
               <button class="btn btn-buy" onclick='agregarAlCarrito(${JSON.stringify(prod)})'>Añadir</button>
             </div>
@@ -249,16 +255,15 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(contenido)
         });
-        mostrarAlerta("Estaremos en contacto contigo via WhatsApp");
+        mostrarAlerta("✅ Estaremos en contacto contigo");
+        carrito.length = 0;
+        renderCarrito();
+        e.target.reset();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
+        modal.hide();
       } catch {
         mostrarAlerta("❌ Error al enviar pedido");
       }
-
-      carrito.length = 0;
-      renderCarrito();
-      document.getElementById('pedidoForm').reset();
-      const modal = bootstrap.Modal.getInstance(document.getElementById('cartModal'));
-      modal.hide();
     });
 
     document.getElementById('search').addEventListener('input', (e) => {
